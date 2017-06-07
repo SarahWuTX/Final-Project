@@ -13,7 +13,7 @@ public:
 	bool init();
 	static cocos2d::CCScene* scene();
 	SceneManager* smr;
-	virtual void update(float dt);
+	void timer(float dt);
 protected:
 	cocos2d::CCTMXTiledMap *map;
 };
