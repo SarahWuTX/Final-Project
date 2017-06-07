@@ -29,14 +29,16 @@ bool GameLevelLayer::init() {
 	
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	//设定定时器，游戏时间5分钟
+	auto timerLayer = Layer::create();
     	timerLabel = Label::create();
     	timerLabel->setTextColor(Color4B::WHITE);
     	timerLabel->setSystemFontSize(40);
     	timerLabel->setAnchorPoint(Vec2(0, 1));
     	timerLabel->setPosition(Vec2(20, visibleSize.height));
-    	this->addChild(timerLabel);
+    	timerLayer->addChild(timerLabel);
     	startTime = time(NULL);
     	schedule(schedule_selector(GameLayer::timer));
+	this->addChild(timerLayer, 100);
 	return true;
 }
 
