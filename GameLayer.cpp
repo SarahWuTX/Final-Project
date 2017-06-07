@@ -26,8 +26,29 @@ bool GameLevelLayer::init() {
 	_player->setPosition(ccp(100, 200));
 	map->addChild(_player, 15);
 	_player->scheduleUpdate();
+	
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	//设定定时器，游戏时间5分钟
+    	timerLabel = Label::create();
+    	timerLabel->setTextColor(Color4B::WHITE);
+    	timerLabel->setSystemFontSize(40);
+    	timerLabel->setAnchorPoint(Vec2(0, 1));
+    	timerLabel->setPosition(Vec2(20, visibleSize.height));
+    	this->addChild(timerLabel);
+    	startTime = time(NULL);
+    	schedule(schedule_selector(GameLayer::timer));
 	return true;
 }
 
+void GameLayer:: timer(float dt){
+    double usedTime_s = 300-difftime(time(NULL), startTime);
+    if (usedTime_s>=0) {
+        double usedTime_min = usedTime_s/60;
+        timerLabel->setString(StringUtils::format("%02d:%02d", (int)usedTime_min,(int)(usedTime_s)%60));
+    } else {
+        unschedule(schedule_selector(GameLayer::timer));
+        //执行游戏结束的函数
+    }
+}
 
 
