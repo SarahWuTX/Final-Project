@@ -2,6 +2,9 @@
 #include"SceneManager.h"
 class GameLevelLayer : public cocos2d::CCLayer
 {
+private:
+    time_t startTime;
+    Label* timerLabel;
 public:
 	GameLevelLayer(void) {};
 	~GameLevelLayer(void) {};
