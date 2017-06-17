@@ -35,7 +35,7 @@ bool GameLevelLayer::init() {
 
 	map->setPosition(Point::ZERO);
 
-	float scale = screenHeight / (map->getMapSize().height*map->getTileSize().height);
+	scale = screenHeight / (map->getMapSize().height*map->getTileSize().height);
 
 	map->setScale(scale);
 
@@ -59,7 +59,7 @@ bool GameLevelLayer::init() {
 
 	_player = Player::create("smallJumpRight.png");
 	_player->isAlive = true;
-	_player->setPosition(20, 100);
+    _player->setPosition(20, 100);
 	_player->setAnchorPoint(Vec2(0.5f, 0));
 
 	//setViewpointCenter(Point(20, 100));
@@ -727,7 +727,7 @@ void GameLevelLayer::playerdie() {
 
 	_player->getPhysicsBody()->setCollisionBitmask(0x02);
 
-	_player->getPhysicsBody()->setVelocity(Vec2(0, 1500));
+	_player->getPhysicsBody()->setVelocity(Vec2(0, 3000));
 	int score = UserDefault::getInstance()->getIntegerForKey("score");
 	log("%d", score);
 	
@@ -753,8 +753,6 @@ void GameLevelLayer::timer(float dt) {
 
 		//执行游戏结束的函数
 		playerdie();  
-		
-		toEndingScene(false); 
 
 	}
 
