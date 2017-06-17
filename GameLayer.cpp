@@ -7,11 +7,12 @@ USING_NS_CC;
 
 
 
-
-
-
 bool GameLevelLayer::init() {
-	UserDefault::getInstance()->setIntegerForKey("score",0);
+    
+    if (isNewGame) {
+        UserDefault::getInstance()->setIntegerForKey("score",0);
+    }
+    
 	std::string path = UserDefault::getInstance()->getXMLFilePath();
 	log("loaded:%s", path.c_str());
 
@@ -35,7 +36,7 @@ bool GameLevelLayer::init() {
 
 	map->setPosition(Point::ZERO);
 
-	float scale = screenHeight / (map->getMapSize().height*map->getTileSize().height);
+	scale = screenHeight / (map->getMapSize().height*map->getTileSize().height);
 
 	map->setScale(scale);
 
@@ -54,12 +55,38 @@ bool GameLevelLayer::init() {
 	int y = _map.at("y").asInt();//起点位置
 
 
+    SimpleAudioEngine::getInstance()->playBackgroundMusic("OnLand.wav", 1);
 
-	SimpleAudioEngine::getInstance()->playBackgroundMusic("OnLand.wav", 1);
+    if (UserDefault::getInstance()->getBoolForKey("sound", true)) {
+        
+        UserDefault::getInstance()->setBoolForKey("sound", true);
+        
+    }
+    
+    if (!UserDefault::getInstance()->getBoolForKey("sound")) {
+        
+        SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+        
+        SimpleAudioEngine::getInstance()->pauseAllEffects();
+        
+    }
 
 	_player = Player::create("smallJumpRight.png");
 	_player->isAlive = true;
-	_player->setPosition(20, 100);
+    
+    if (!isNewGame) {
+        _player->setPositionX(UserDefault::getInstance()->getFloatForKey("player_x"));
+        _player->setPositionY(UserDefault::getInstance()->getFloatForKey("player_y"));
+        //_player->setPositionZ(UserDefault::getInstance()->getFloatForKey("player_z"));
+        
+    } else {
+        
+        _player->setPosition(Vec2(origin.x + visibleSize.width*0.2, origin.y + visibleSize.height*0.3));
+        
+    }
+    
+    
+	
 	_player->setAnchorPoint(Vec2(0.5f, 0));
 
 	//setViewpointCenter(Point(20, 100));
@@ -97,6 +124,7 @@ bool GameLevelLayer::init() {
 	this->addChild(_player, 1);//设置人物
 
 
+    
 
 
 
@@ -242,10 +270,11 @@ bool GameLevelLayer::init() {
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
 	//键盘监听
-	
-	timerLayer = Layer::create();
+    
+    
+    timerLayer = Layer::create();
 
-	 //定时器，游戏时间5分钟////// 
+    //定时器，游戏时间5分钟//////
 
 	timerLabel = Label::create();
 
@@ -266,20 +295,19 @@ bool GameLevelLayer::init() {
 	scheduleOnce(schedule_selector(GameLevelLayer::updateStart), 0);
 	
 	//声音按钮
-    if (SimpleAudioEngine::getInstance()->getBackgroundMusicVolume()==1) {
+    if (UserDefault::getInstance()->getBoolForKey("sound")) {
 	    
         soundLabel = MenuItemLabel::create(Label::createWithSystemFont("Sound:on", "Arial", 30), CC_CALLBACK_1(GameLevelLayer::menuCallBack, this));
-	
-	soundLabel->setTag(11);
 	    
-    } 
+    }
+    
     else {
 		
         soundLabel = MenuItemLabel::create(Label::createWithSystemFont("Sound:off", "Arial", 30), CC_CALLBACK_1(GameLevelLayer::menuCallBack, this));
-        
-	soundLabel->setTag(10);
 	    
     }
+    
+    soundLabel->setTag(10);
 	
     soundLabel->setAnchorPoint(Vec2(0.5, 1));
 	
@@ -376,12 +404,13 @@ void GameLevelLayer::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
 void GameLevelLayer::update(float delta) {
 	//Point position = _player->getPosition();
 	//log("%f,%f", position.x, position.y);
-	
-	if (_player->getPositionX() > screenWidth/2 && _player->isAlive) {
+    
+   
+    if (_player->getPositionX() > screenWidth/2 && _player->isAlive) {
         
-        	timerLayer->setPositionX(_player->getPositionX() - screenWidth/2);
+        timerLayer->setPositionX(_player->getPositionX() - screenWidth/2);
         
-    	}
+    }
 
 	auto rightarrow = EventKeyboard::KeyCode::KEY_RIGHT_ARROW;
 
@@ -712,8 +741,8 @@ void GameLevelLayer::updatewhenjump() {
 }
 
 void GameLevelLayer::playerdie() {
-	
-	_player->isAlive = false;
+    
+    _player->isAlive = false;
 
 	_player->stopAllActions();
 
@@ -727,23 +756,32 @@ void GameLevelLayer::playerdie() {
 
 	_player->getPhysicsBody()->setCollisionBitmask(0x02);
 
-	_player->getPhysicsBody()->setVelocity(Vec2(0, 1500));
+	_player->getPhysicsBody()->setVelocity(Vec2(0, 3000));
 	int score = UserDefault::getInstance()->getIntegerForKey("score");
 	log("%d", score);
-	
-	scheduleOnce(schedule_selector(GameLevelLayer::dieDelay), 3);
+    
+    scheduleOnce(schedule_selector(GameLevelLayer::dieDelay), 3);
+    
+    
 
 }
 
 void GameLevelLayer::timer(float dt) {
+    
+    double leftTime_s = 300 - difftime(time(NULL), startTime);
+    
+    if (!isNewGame) {
+        
+        //leftTime_s -= 300 - UserDefault::getInstance()->getDoubleForKey("leftTime_s");
+    }
+    
+    UserDefault::getInstance()->setDoubleForKey("leftTime_s", leftTime_s);
 
-	double usedTime_s = 300 - difftime(time(NULL), startTime);
+	if (leftTime_s >= 0) {
 
-	if (usedTime_s >= 0) {
+		double leftTime_min = leftTime_s / 60;
 
-		double usedTime_min = usedTime_s / 60;
-
-		timerLabel->setString(StringUtils::format("%02d:%02d", (int)usedTime_min, (int)(usedTime_s) % 60));
+		timerLabel->setString(StringUtils::format("%02d:%02d", (int)leftTime_min, (int)(leftTime_s) % 60));
 
 	}
 
@@ -754,7 +792,7 @@ void GameLevelLayer::timer(float dt) {
 		//执行游戏结束的函数
 		playerdie();  
 		
-		toEndingScene(false); 
+		
 
 	}
 
@@ -763,7 +801,6 @@ void GameLevelLayer::updateStart(float dt) {
 	Director::getInstance()->getRunningScene()->getPhysicsWorld()->setAutoStep(false);
 	scheduleUpdate();
 }
-
 void GameLevelLayer::dieDelay(float dt) {
     toEndingScene(false);
 }
@@ -779,29 +816,36 @@ Scene* GameLevelLayer::createScene() {
 void GameLevelLayer:: menuCallBack(Ref* pSender){
     switch (((MenuItemImage *)pSender)->getTag()) {
 		    
-        case 10:    
-            SimpleAudioEngine::getInstance()->resumeAllEffects();
-		    
-            SimpleAudioEngine::getInstance()->setBackgroundMusicVolume(1);
-		    
-	    soundLabel->setString("Sound:on");
-		    
-            soundLabel->setTag(11);
-		    
+        case 10:
+            
+            if (UserDefault::getInstance()->getBoolForKey("sound")) {
+                
+                SimpleAudioEngine::getInstance()->pauseAllEffects();
+                
+                SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+                
+                soundLabel->setString("Sound:off");
+                
+                UserDefault::getInstance()->setBoolForKey("sound", false);
+                
+            }
+            else {
+                
+                SimpleAudioEngine::getInstance()->resumeAllEffects();
+                
+                SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
+                
+                soundLabel->setString("Sound:on");
+                
+                UserDefault::getInstance()->setBoolForKey("sound", true);
+                
+            }
+            
             break;
 		    
-        case 11:
-            SimpleAudioEngine::getInstance()->pauseAllEffects();
-		    
-            SimpleAudioEngine::getInstance()->setBackgroundMusicVolume(0);
-		    
-	    soundLabel->setString("Sound:off");
-		    
-            soundLabel->setTag(10);
-		    
-            break;
-		    
+            
         case 20:
+            saveData();
             //存储游戏进度，未完成
 		    
             SimpleAudioEngine::getInstance()->stopBackgroundMusic();
@@ -848,4 +892,15 @@ void GameLevelLayer:: toMainScene(){
 	
     Director::getInstance()->replaceScene(scene);
 	
+}
+
+void GameLevelLayer:: saveData(){
+    
+    UserDefault::getInstance()->setFloatForKey("player_x", _player->getPositionX());
+    UserDefault::getInstance()->setFloatForKey("player_y", _player->getPositionY());
+    //UserDefault::getInstance()->setFloatForKey("player_z", _player->getPositionZ());
+    
+    log("x:%f", UserDefault::getInstance()->getFloatForKey("player_x"));
+    log("y:%f", UserDefault::getInstance()->getFloatForKey("player_y"));
+    //log("z:%f", UserDefault::getInstance()->getFloatForKey("player_z"));
 }
