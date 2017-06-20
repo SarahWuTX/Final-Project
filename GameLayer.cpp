@@ -55,7 +55,7 @@ bool GameLevelLayer::init() {
 	_player = Player::create("MarioStand.png");
 	_player->isAlive = true;
 	_player->isPassed = false;
-	_player->setPosition(Vec2(200,140));
+	_player->setPosition(position);
 	setViewpointCenter(_player->getPosition());
 	_player->setAnchorPoint(Vec2(0.5f, 0));
 	_player->setScale(1);
@@ -717,7 +717,11 @@ void GameLevelLayer::playerdie() {
 
 
 void GameLevelLayer::timer(float dt) {
-	double usedTime_s = 300 - difftime(time(NULL), startTime);
+	double leftTime = 300;
+    	if (UserDefault::getInstance()->getDoubleForKey("leftTime")) {
+        	leftTime = UserDefault::getInstance()->getDoubleForKey("leftTime");
+    	}
+	double usedTime_s = leftTime - difftime(time(NULL), startTime);
 	if (usedTime_s >= 0) {
 		double usedTime_min = usedTime_s / 60;
 		timerLabel->setString(StringUtils::format("%02d:%02d", (int)usedTime_min, (int)(usedTime_s) % 60));
@@ -779,6 +783,9 @@ void GameLevelLayer::menuCallBack(Ref* pSender) {
 	case 20:
 		UserDefault::getInstance()->setFloatForKey("x", _player->getPositionX());
 		UserDefault::getInstance()->setFloatForKey("y", _player->getPositionY());
+		double previousLeftTime = UserDefault::getInstance()->getDoubleForKey("leftTime");
+            	UserDefault::getInstance()->setDoubleForKey("leftTime",previousLeftTime-difftime(time(NULL), startTime));
+            	log("leftTime:%lf", UserDefault::getInstance()->getDoubleForKey("leftTime"));
 		UserDefault::getInstance()->flush();
 		SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 		SimpleAudioEngine::getInstance()->stopAllEffects();
