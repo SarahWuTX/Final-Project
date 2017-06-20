@@ -10,12 +10,13 @@ void MenuLayer::menuCallback(Ref* pSender) {
 		UserDefault::getInstance()->setFloatForKey("y", 0);
 		UserDefault::getInstance()->setIntegerForKey("score", 0);
 		UserDefault::getInstance()->setIntegerForKey("game", 1);
+		UserDefault::getInstance()->setDoubleForKey("leftTime", 300);
 		UserDefault::getInstance()->flush();
 		toGameScene();
 		
 		break;
 	case 2:
-		
+		toGameScene();
 		break;
 	case 3:
 		toRanklistScene();
