@@ -76,13 +76,12 @@ bool GameLevelLayer::init() {
 	_player->setPhysicsBody(body);
 	this->addChild(_player, 1);//设置人物
 
-	auto objs = objects->getObjects();
-	for (int i=0;i<objs.size();i++)
+	for (int i = 0; i<objs.size(); i++)
 	{
-		auto monsterPoint = objs.at(i).asValueMap();
-		float monsterX = monsterPoint.at("x").asFloat();
-		float monsterY = monsterPoint.at("y").asFloat();
-		String type = monsterPoint.at("type").asString();;
+		auto objectPoint = objs.at(i).asValueMap();
+		float X = objectPoint.at("x").asFloat();
+		float Y = objectPoint.at("y").asFloat();
+		String type = objectPoint.at("type").asString();;
 
 		if (type._string == "mushroom")
 		{
@@ -96,19 +95,47 @@ bool GameLevelLayer::init() {
 			body_m->setContactTestBitmask(0x01);
 			body_m->setCollisionBitmask(0x01);
 			body_m->setGroup(3);
+
 			PhysicsShape* ps_m = body_m->getShape(0);
+
 			ps_m->setMass(0.2f);
 			ps_m->setFriction(-1);
 			ps_m->setDensity(0.1f);
 			ps_m->setRestitution(1.1);
+
+		
 			_Monster->setPhysicsBody(body_m);
 			this->addChild(_Monster, 1);
 			_Monster->getPhysicsBody()->setVelocity(Vec2(-100, 0));
 			_Monster->setPosition(Point(X*scale, Y*scale));
 			enemyrun(_Monster);
 		}
+		if (type._string == "MushroomReward")
+		{
+			Unit*_unit = Unit::create("rewardMushroomSet1.png");
+			_unit->setScale(2);
+			_unit->setTag(3);
+			auto body_u = PhysicsBody::createBox(_unit->getContentSize());
+			body_u->setRotationEnable(false);
+			body_u->setEnabled(true);
+			body_u->setCategoryBitmask(0x01);
+			body_u->setContactTestBitmask(0x01);
+			body_u->setCollisionBitmask(0x01);
+			body_u->setGroup(1);
+			PhysicsShape* ps_u = body_u->getShape(0);
+			ps_u->setMass(0.2f);
+			ps_u->setFriction(0);
+			ps_u->setDensity(0.2f);
+
+			ps_u->setRestitution(1.1);
+
+			_unit->setPhysicsBody(body_u);
+			this->addChild(_unit, 1);
+			_unit->setPosition(Point(X*scale, Y*scale));
+			_unit->setVisible(false);
+		}
 	}
-	//怪物生成
+	//怪物蘑菇生成
 
 	Land = map->getLayer("land");
 
@@ -464,7 +491,7 @@ bool GameLevelLayer::onContactBegin(PhysicsContact& contact) {
 		}
 		else
 		{
-			/*if (spriteA->getTag() == 2 && spriteA->getPhysicsBody()->getGroup() == 3 && spriteB->getPhysicsBody()->getGroup() == 1 && spriteA->getPosition().y == spriteB->getPosition().y)
+			if (spriteA->getTag() == 2 && spriteA->getPhysicsBody()->getGroup() == 3 && spriteB->getPhysicsBody()->getGroup() == 1 && spriteA->getPosition().y == spriteB->getPosition().y)
 			{
 				if (spriteA->getPhysicsBody()->getVelocity().x<0)
 				{
@@ -527,7 +554,7 @@ bool GameLevelLayer::onContactBegin(PhysicsContact& contact) {
 						spriteA->getPhysicsBody()->setVelocity(Vec2(-100, 0));
 					}
 				}
-			}*/
+			}
 			if (spriteA->getTag() == 1 && spriteA->getPhysicsBody()->getGroup() != 3 && spriteB->getPhysicsBody()->getGroup() == 3 && spriteA->getPosition().y> spriteB->getPosition().y)
 			{
 
@@ -551,6 +578,22 @@ bool GameLevelLayer::onContactBegin(PhysicsContact& contact) {
 				playerdie();
 				//toEndingScene(_player->isAlive);
 			}*/
+			if (spriteA->getTag() == 1 && spriteB->getTag() == 3&& spriteA->getPosition().y < spriteB->getPosition().y)
+			{
+
+				spriteB->setScale(3);
+				spriteB->setVisible(true);
+				spriteB->getPhysicsBody()->setVelocity(Vec2(100, 0));
+				
+
+			}
+			if (spriteA->getTag() == 3 && spriteB->getTag() == 1&& spriteA->getPosition().y > spriteB->getPosition().y)
+			{
+				spriteA->setScale(3);
+				spriteA->setVisible(true);
+				spriteA->getPhysicsBody()->setVelocity(Vec2(100,0 ));
+				
+			}
 		}
 	}
 	
@@ -575,7 +618,19 @@ void GameLevelLayer::onContactSeparate(PhysicsContact& contact) {
 			_player->isOnGround = false;
 
 		}
+		if (spriteA->getTag() == 1 && spriteB->getTag() == 3 )
+	         {
+		         spriteB->removeFromParent();
+	        }
+	         if (spriteA->getTag() == 3 && spriteB->getTag() == 1 )
+	         {
+		          spriteA->removeFromParent();
+	        }
 	}
+		
+        
+	
+	
 }
 void GameLevelLayer::smallWalkRight() {
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("smallWalkRight.plist");
