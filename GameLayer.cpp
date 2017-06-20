@@ -559,13 +559,13 @@ bool GameLevelLayer::onContactBegin(PhysicsContact& contact) {
 			{
 
 				enemydie(spriteB);
-				SimpleAudioEngine::getInstance()->playEffect("Enemydie.wav");
+				SimpleAudioEngine::getInstance()->playEffect("CaiSiGuaiWu.wav");
 
 			}
 			if (spriteA->getPhysicsBody()->getGroup() == 3 && spriteB->getPhysicsBody()->getGroup() != 3 && spriteB->getTag() == 1 && spriteA->getPosition().y<spriteB->getPosition().y)
 			{
 				enemydie(spriteA);
-				SimpleAudioEngine::getInstance()->playEffect("Enemydie.wav");
+				SimpleAudioEngine::getInstance()->playEffect("CaiSiGuaiWu.wav");
 
 			}
 			/*if (spriteA->getTag() == 1 && spriteB->getTag() == 2 && spriteA->getPhysicsBody()->getGroup() == 0 && spriteB->getPhysicsBody()->getGroup() == 3
