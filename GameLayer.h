@@ -28,6 +28,8 @@ public:
 	Monster* _monster;
 	Unit*_unit;
 	float scale;
+	float X;
+	float Y;
 	bool isKeyPressed(EventKeyboard::KeyCode keycode);
 	bool sound;
 	void keyPressedDuration(EventKeyboard::KeyCode keycode, float delta);
