@@ -674,7 +674,7 @@ void GameLevelLayer::walkRight() {
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("walkRight.plist");
 	auto animation = Animation::create();
 	for (int i = 1; i <11; i++) {
-		std::string szName = StringUtils::format("walkRight%d.gif", i);
+		std::string szName = StringUtils::format("walkRight%d.png", i);
 		animation->addSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName(szName));
 	}
 	animation->setDelayPerUnit(1.0f / 15.0f);
