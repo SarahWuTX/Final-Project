@@ -98,13 +98,13 @@ bool GameLevelLayer::init() {
 			body_m->setGroup(3);
 			PhysicsShape* ps_m = body_m->getShape(0);
 			ps_m->setMass(0.2f);
-			ps_m->setFriction(0);
-			ps_m->setDensity(0.2f);
-			ps_m->setRestitution(0);
+			ps_m->setFriction(-1);
+			ps_m->setDensity(0.1f);
+			ps_m->setRestitution(1.1);
 			_Monster->setPhysicsBody(body_m);
 			this->addChild(_Monster, 1);
 			_Monster->getPhysicsBody()->setVelocity(Vec2(-100, 0));
-			_Monster->setPosition(Point(monsterX, monsterY));
+			_Monster->setPosition(Point(X*scale, Y*scale));
 			enemyrun(_Monster);
 		}
 	}
