@@ -584,7 +584,7 @@ bool GameLevelLayer::onContactBegin(PhysicsContact& contact) {
 				spriteB->setScale(3);
 				spriteB->setVisible(true);
 				spriteB->getPhysicsBody()->setVelocity(Vec2(100, 0));
-				
+				SimpleAudioEngine::getInstance()->playEffect("DingChuMoGuHuoHua.wav");
 
 			}
 			if (spriteA->getTag() == 3 && spriteB->getTag() == 1&& spriteA->getPosition().y > spriteB->getPosition().y)
@@ -592,7 +592,7 @@ bool GameLevelLayer::onContactBegin(PhysicsContact& contact) {
 				spriteA->setScale(3);
 				spriteA->setVisible(true);
 				spriteA->getPhysicsBody()->setVelocity(Vec2(100,0 ));
-				
+				SimpleAudioEngine::getInstance()->playEffect("DingChuMoGuHuoHua.wav");
 			}
 		}
 	}
@@ -621,10 +621,12 @@ void GameLevelLayer::onContactSeparate(PhysicsContact& contact) {
 		if (spriteA->getTag() == 1 && spriteB->getTag() == 3 )
 	         {
 		         spriteB->removeFromParent();
+			SimpleAudioEngine::getInstance()->playEffect("EatMushroomOrFlower.wav");
 	        }
 	         if (spriteA->getTag() == 3 && spriteB->getTag() == 1 )
 	         {
 		          spriteA->removeFromParent();
+			 SimpleAudioEngine::getInstance()->playEffect("EatMushroomOrFlower.wav");
 	        }
 	}
 		
